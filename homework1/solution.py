@@ -65,9 +65,9 @@ class HardParzen:
                 for k in neighbours :
                     onehot_count[self.train_labels[k]-1] += 1
                 
-                predictions[i] = int(np.argmax(onehot_count) + 1) 
+                predictions[i] = np.argmax(onehot_count) + 1
 
-        return predictions
+        return predictions.astype(int)
 
 
 class SoftRBFParzen:
@@ -88,17 +88,20 @@ class SoftRBFParzen:
 
     def rbf(self, a, b) :
 
-        return (1/((2*np.pi)**(self.n_features/2))*self.sigma**self.n_features)*np.exp((-1/2)*((self.euclidean_dist(a, b)**2)/(self.sigma**2)))
+        D = self.n_features
+        o = self.sigma
+
+        return (1/((2*np.pi)**(D/2))*o**D)*np.exp((-(1/2))*((self.euclidean_dist(a, b)**2)/(o**2)))
 
 
     def compute_predictions(self, test_data):
+
         predictions = np.empty((len(test_data)))
         
         for (i, point) in enumerate(test_data) :
 
-            onehot_count = np.zeros((self.n_classes))
-            scores = np.array([self.rbf(a,point) for a in self.train_inputs ])
-            print(scores)
+            # onehot_count = np.zeros((self.n_classes))
+            scores = np.array([self.rbf(point, a) for a in self.train_inputs ])
             # neighbours = []
             # neighbours = [ point_index for (point_index, distance) in enumerate(dists) if distance < self.h ]
 
@@ -108,20 +111,26 @@ class SoftRBFParzen:
             #     for k in neighbours :
             #         onehot_count[self.train_labels[k]-1] += 1
                 
-            predictions[i] = int(self.train_labels[np.argmax(scores)]) 
+            predictions[i] = self.train_labels[np.argmax(scores)]
 
-        return predictions
+        return predictions.astype(int)
 
-train = [[1,1], [2,2], [3,3], [4,4]]
-labels = [1,2,3,4]
+# train = [[1,1,1], [2,2,2], [3,3,3], [4,4,4]]
+# labels = [4,3,2,1]
 
-s_par = SoftRBFParzen(2)
-s_par.train(train, labels)
-pred = s_par.compute_predictions(train)
-print(pred)
+# s_par = SoftRBFParzen(2)
+# s_par.train(train, labels)
+# pred = s_par.compute_predictions(train)
+# print(pred)
+
 
 def split_dataset(iris):
-    pass
+
+    training_set = np.array( [sample for (index, sample) in enumerate(iris) if (index % 5) in [0,1,2]])
+    validation_set = np.array( [sample for (index, sample) in enumerate(iris) if (index % 5) == 3])
+    test_set = np.array( [sample for (index, sample) in enumerate(iris) if (index % 5) == 4])
+
+    return training_set, validation_set, test_set
 
 
 class ErrorRate:
@@ -132,10 +141,22 @@ class ErrorRate:
         self.y_val = y_val
 
     def hard_parzen(self, h):
-        pass
+        classifier = HardParzen(h)
+        classifier.train(self.x_train, self.y_train)
+        predictions = classifier.compute_predictions(self.x_val)
+        total = len(self.y_val)
+        good_predictions = np.sum(predictions == self.y_val)
+
+        return 1 - (good_predictions / total)
 
     def soft_parzen(self, sigma):
-        pass
+        classifier = SoftRBFParzen(sigma)
+        classifier.train(self.x_train, self.y_train)
+        predictions = classifier.compute_predictions(self.x_val)
+        total = len(self.y_val)
+        good_predictions = np.sum(predictions == self.y_val)
+
+        return 1 - (good_predictions / total)
 
 
 def get_test_errors(iris):
@@ -146,3 +167,17 @@ def random_projections(X, A):
     pass
 
 
+
+
+h_values = [0.01,0.1,0.2,0.3,0.4,0.5,1.0,3.0,10.0,20.0]
+o_values = [0.01,0.1,0.2,0.3,0.4,0.5,1.0,3.0,10.0,20.0]
+
+train, val, test = split_dataset(iris_ds)
+x_train = train[:,0:-1]
+y_train = train[:,-1]
+x_val = val[:,0:-1]
+y_val = val[:,-1]
+
+er = ErrorRate(x_train, y_train, x_val ,y_val )
+hard_parzen_error = np.array( [ er.hard_parzen(h) for h in h_values ] )
+# soft_parzen_error =  np.array( [ er.soft_parzen(o) for o in o_values ] )
