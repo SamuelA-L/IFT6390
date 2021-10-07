@@ -113,15 +113,6 @@ class SoftRBFParzen:
         return predictions.astype(int)
 
 
-train = [[1,1,1], [2,2,2], [3,3,3], [4,4,4]]
-labels = [4,3,2,1]
-
-s_par = SoftRBFParzen(0.1)
-s_par.train(train, labels)
-pred = s_par.compute_predictions(train)
-print(pred)
-
-
 def split_dataset(iris):
 
     training_set = np.array([sample for (index, sample) in enumerate(iris) if (index % 5) in [0,1,2]])
@@ -203,18 +194,16 @@ def random_projections(X, A):
     return np.array(X_proj)
 
 
-
-
 #report questions
 
-# # 5 a et b
+# import matplotlib.pyplot as plt
+
+# Q5 a et b
 # h_values = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
 # o_values = [0.01, 0.1, 0.2, 0.3, 0.4, 0.5, 1.0, 3.0, 10.0, 20.0]
 # h_star, o_star, hard_parzen_error, soft_parzen_error = select_params(h_values, o_values, iris_ds)
 # print(hard_parzen_error)
 # print(soft_parzen_error)
-
-# import matplotlib.pyplot as plt
 
 # plt.plot(h_values, hard_parzen_error, label="hard parzen")
 # plt.plot(o_values, soft_parzen_error, label="soft parzen")
@@ -223,12 +212,10 @@ def random_projections(X, A):
 # plt.title("Erreurs pour différents paramètres")
 # plt.legend()
 # plt.show()
-# plt.savefig('Practical-q5ab.png')
 
-# # 9
+# Q9
 
 # x_train, y_train, x_val, y_val, x_test, y_test = x_y_from_split(iris_ds)
-
 
 # projections = np.empty((500, 90, 2))
 # hard_parzen_proj_errors = np.empty((500, 10))
@@ -255,11 +242,20 @@ def random_projections(X, A):
 # print(soft_parzen_proj_errors_std)
 
 
-# # hard_parzen_proj_errors_means = [0.66253333, 0.4114, 0.24033333, 0.18046667, 0.15626667, 0.15326667, 0.17986667, 0.39073333, 0.6656, 0.66666667]
-# # soft_parzen_proj_errors_means = [0.16406667, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333]
 
-# # plt.plot(h_values, hard_parzen_proj_errors_means, label="hard parzen")
-# # plt.plot(o_values, soft_parzen_proj_errors_means, label="soft parzen")
+# [0.65993333 0.41366667 0.23813333 0.17586667 0.15513333 0.14893333
+#  0.1702     0.3756     0.66566667 0.66666667]
+
+# [0.16126667 0.1252     0.12553333 0.13093333 0.1374     0.14186667
+#  0.16193333 0.17766667 0.18       0.18033333]
+
+# [8.18752167e-02 1.24694738e-01 1.14305944e-01 1.01542678e-01
+#  9.70354116e-02 1.00116466e-01 1.12144569e-01 1.84270863e-01
+#  1.37072568e-02 1.33226763e-15]
+
+# [0.10110367 0.09720805 0.09528463 0.09703846 0.09896754 0.0997467
+#  0.10478463 0.10961093 0.11025224 0.11024165]
+
 # plt.errorbar(o_values, soft_parzen_proj_errors_means, yerr=0.2*soft_parzen_proj_errors_std, label="hard parzen")
 # plt.errorbar(h_values, hard_parzen_proj_errors_means, yerr=0.2*hard_parzen_proj_errors_std, label="soft parzen")
 # plt.xlabel("valeurs pour h et sigma")
