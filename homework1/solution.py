@@ -204,49 +204,56 @@ h_star, o_star, hard_parzen_error, soft_parzen_error = select_params(h_values, o
 print(hard_parzen_error)
 print(soft_parzen_error)
 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# plt.plot(h_values, hard_parzen_error, label="hard parzen")
-# plt.plot(o_values, soft_parzen_error, label="soft parzen")
-# plt.xlabel("valeurs pour h et sigma")
-# plt.ylabel("ratio d'erreur")
-# plt.title("Erreurs pour différents paramètres")
-# plt.legend()
-# plt.show()
-# plt.savefig('Practical-q5ab.png')
+plt.plot(h_values, hard_parzen_error, label="hard parzen")
+plt.plot(o_values, soft_parzen_error, label="soft parzen")
+plt.xlabel("valeurs pour h et sigma")
+plt.ylabel("ratio d'erreur")
+plt.title("Erreurs pour différents paramètres")
+plt.legend()
+plt.show()
+plt.savefig('Practical-q5ab.png')
 
 # 9
 
-# x_train, y_train, x_val, y_val, x_test, y_test = x_y_from_split(iris_ds)
-#
-#
-# projections = np.empty((500, 90, 2))
-# hard_parzen_proj_errors = np.empty((500, 10))
-# soft_parzen_proj_errors = np.empty((500, 10))
-# for i in range(500):
-#     A = np.random.normal(0, 1, 8).reshape(4, 2)
-#     train_projection = random_projections(x_train, A)
-#     val_projections = random_projections(x_val, A)
-#     for j in range(10) :
-#         error = ErrorRate(train_projection, y_train, val_projections, y_val)
-#         hard_parzen_proj_errors[i][j] = error.hard_parzen(h_values[j])
-#         soft_parzen_proj_errors[i][j] = error.soft_parzen(o_values[j])
-#
-#
-# hard_parzen_proj_errors_means = np.mean(hard_parzen_proj_errors, axis=0)
-# soft_parzen_proj_errors_means = np.mean(soft_parzen_proj_errors, axis=0)
-#
-# print(hard_parzen_proj_errors_means)
-# print(soft_parzen_proj_errors_means)
+x_train, y_train, x_val, y_val, x_test, y_test = x_y_from_split(iris_ds)
 
 
-hard_parzen_proj_errors_means = [0.66253333, 0.4114, 0.24033333, 0.18046667, 0.15626667, 0.15326667, 0.17986667, 0.39073333, 0.6656, 0.66666667]
-soft_parzen_proj_errors_means = [0.16406667, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333]
+projections = np.empty((500, 90, 2))
+hard_parzen_proj_errors = np.empty((500, 10))
+soft_parzen_proj_errors = np.empty((500, 10))
+for i in range(500):
+    A = np.random.normal(0, 1, 8).reshape(4, 2)
+    train_projection = random_projections(x_train, A)
+    val_projections = random_projections(x_val, A)
+    for j in range(10) :
+        error = ErrorRate(train_projection, y_train, val_projections, y_val)
+        hard_parzen_proj_errors[i][j] = error.hard_parzen(h_values[j])
+        soft_parzen_proj_errors[i][j] = error.soft_parzen(o_values[j])
+
+
+hard_parzen_proj_errors_means = np.mean(hard_parzen_proj_errors, axis=0)
+soft_parzen_proj_errors_means = np.mean(soft_parzen_proj_errors, axis=0)
+
+hard_parzen_proj_errors_std = np.std(hard_parzen_proj_errors, axis=0)
+soft_parzen_proj_errors_std = np.std(soft_parzen_proj_errors, axis=0)
+
+print(hard_parzen_proj_errors_means)
+print(soft_parzen_proj_errors_means)
+print(hard_parzen_proj_errors_std)
+print(soft_parzen_proj_errors_std)
+
+
+# hard_parzen_proj_errors_means = [0.66253333, 0.4114, 0.24033333, 0.18046667, 0.15626667, 0.15326667, 0.17986667, 0.39073333, 0.6656, 0.66666667]
+# soft_parzen_proj_errors_means = [0.16406667, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333, 0.14093333]
 
 # plt.plot(h_values, hard_parzen_proj_errors_means, label="hard parzen")
 # plt.plot(o_values, soft_parzen_proj_errors_means, label="soft parzen")
-# plt.xlabel("valeurs pour h et sigma")
-# plt.ylabel("ratio d'erreur")
-# plt.title("Erreurs pour différents paramètres")
-# plt.legend()
-# plt.show()
+plt.errorbar(o_values, soft_parzen_proj_errors_means, yerr=0.2*soft_parzen_proj_errors_std, label="hard parzen")
+plt.errorbar(h_values, hard_parzen_proj_errors_means, yerr=0.2*hard_parzen_proj_errors_std, label="soft parzen")
+plt.xlabel("valeurs pour h et sigma")
+plt.ylabel("ratio d'erreur")
+plt.title("Erreurs pour différents paramètres")
+plt.legend()
+plt.show()
