@@ -5,6 +5,7 @@ from sklearn.preprocessing import StandardScaler, scale, normalize
 from sklearn.decomposition import PCA
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report
+from sklearn.linear_model import LogisticRegression
 
 
 
@@ -39,6 +40,13 @@ def create_submission_csv(predictions_df, name):
     predictions_df.to_csv(submission_file, index=True)
     submission_file.close()
 
+def train_logistic_regression(x_train, y_train) :
+    classifier = LogisticRegression(random_state=8)
+    classifier.fit(x_train, y_train)
+
+    return classifier
+
+
 
 target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospheric river']
 train = pd.read_csv('train.csv')
@@ -54,12 +62,21 @@ x_train_pca = apply_pca(pca_object, x_train)
 x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
-gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train)
-predictions = gauss_nb_classifier.predict(x_val_pca)
+# gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train)
+# predictions = gauss_nb_classifier.predict(x_val_pca)
+#
+# print(classification_report(y_val, predictions, target_names=target_names))
+#
+# test_predictions = gauss_nb_classifier.predict(test_pca)
+# test_predictions_df = pd.DataFrame(test_predictions)
+# create_submission_csv(test_predictions_df, 'predictions_val')
+
+logistic_classifier = train_logistic_regression(x_train_pca, y_train)
+predictions = logistic_classifier.predict(x_val_pca)
 
 
 print(classification_report(y_val, predictions, target_names=target_names))
 
-test_predictions = gauss_nb_classifier.predict(test_pca)
+test_predictions = logistic_classifier.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
-create_submission_csv(test_predictions_df, 'predictions')
+create_submission_csv(test_predictions_df, 'predictions_')
