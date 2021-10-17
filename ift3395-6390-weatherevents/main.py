@@ -74,7 +74,6 @@ test_pca = apply_pca(pca_object, test)
 logistic_classifier = train_logistic_regression(x_train_pca, y_train)
 predictions = logistic_classifier.predict(x_val_pca)
 
-
 print(classification_report(y_val, predictions, target_names=target_names))
 
 test_predictions = logistic_classifier.predict(test_pca)
