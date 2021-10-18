@@ -8,6 +8,7 @@ from sklearn.metrics import classification_report
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from tensorflow import keras
 
 
 def create_submission_csv(predictions_df, name):
@@ -52,6 +53,7 @@ def train_logistic_regression(x_train, y_train, max_iter=100) :
 
     return classifier
 
+# data
 
 target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospheric river']
 train = pd.read_csv('train.csv')
@@ -61,6 +63,20 @@ x_train = train.iloc[:, :-1]
 y_train = train.iloc[:, -1]
 
 x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=8)
+
+train_len = len(y_train)
+val_len = len(y_val)
+value_train, count_train = np.unique(y_train, return_counts=True)
+value_val, count_val = np.unique(y_val, return_counts=True)
+print("train : ")
+for i in range(count_train.shape[0]):
+    print(value_train[i], " : ", count_train[i]/train_len, " %")
+
+print("val : ")
+for i in range(count_val.shape[0]):
+    print(value_val[i], " : ", count_val[i]/val_len, " %")
+
+
 
 pca_object = train_PCA(x_train)
 x_train_pca = apply_pca(pca_object, x_train)
@@ -103,14 +119,48 @@ print('Decision Tree :\n', classification_report(y_val, predictions, target_name
 '''
 
 
-
+'''
 #---random forest---
 
-random_forest_classifier = RandomForestClassifier(max_depth=None, random_state=8)
-random_forest_classifier.fit(x_train, y_train)
-predictions = random_forest_classifier.predict(x_val)
+random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8)
+random_forest_classifier.fit(x_train_pca, y_train)
+predictions = random_forest_classifier.predict(x_val_pca)
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
-test_predictions = random_forest_classifier.predict(test)
+test_predictions = random_forest_classifier.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
+
+'''
+
+'''
+from numpy.random import seed
+seed(1)
+# from tensorflow import set_random_seed
+# set_random_seed(2)
+
+n_features = x_train_pca.shape[1]
+
+dnn = keras.Sequential()
+dnn.add(keras.Input(shape=(n_features,)))
+dnn.add(keras.layers.Dense(128, activation='relu'))
+dnn.add(keras.layers.Dense(256, activation='relu'))
+dnn.add(keras.layers.Dense(1, activation='sigmoid'))
+dnn.summary()
+
+adam_optimizer = keras.optimizers.Adam(learning_rate=0.001)
+sgd_optimizer = keras.optimizers.SGD(learning_rate=0.001)
+
+
+dnn.compile(
+    optimizer=adam_optimizer,
+    loss='categorical_crossentropy',
+    metrics=['Precision', 'Accuracy']
+)
+
+# callback = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=15,  restore_best_weights=True, mode='auto')
+
+dnn.fit(x_train_pca, y_train, epochs=50, batch_size=16)#, callbacks=[callback])
+predictions = dnn.predict(x_val_pca)
+print('Dnn : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
+'''
 
