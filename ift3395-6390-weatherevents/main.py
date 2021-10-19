@@ -116,13 +116,15 @@ decision_tree_classifier = DecisionTreeClassifier(random_state=8)
 decision_tree_classifier.fit(x_train, y_train)
 predictions = decision_tree_classifier.predict(x_val)
 print('Decision Tree :\n', classification_report(y_val, predictions, target_names=target_names))
+test_predictions = decision_tree_classifier.predict(test)
+test_predictions_df = pd.DataFrame(test_predictions)
+create_submission_csv(test_predictions_df, 'predictions')
 '''
 
 
-'''
 #---random forest---
 
-random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8)
+random_forest_classifier = RandomForestClassifier(max_depth=15, random_state=8, criterion='entropy')
 random_forest_classifier.fit(x_train_pca, y_train)
 predictions = random_forest_classifier.predict(x_val_pca)
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
@@ -130,7 +132,7 @@ test_predictions = random_forest_classifier.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 
-'''
+
 
 '''
 from numpy.random import seed
