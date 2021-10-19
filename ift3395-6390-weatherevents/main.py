@@ -40,8 +40,8 @@ def apply_pca(trained_pca : PCA, data):
     return pc_data
 
 
-def train_gauss_naive_bayes(x_train,y_train):
-    classifier = GaussianNB()
+def train_gauss_naive_bayes(x_train,y_train, priors=None):
+    classifier = GaussianNB(priors=priors)
     classifier.fit(x_train, y_train)
 
     return classifier
@@ -83,10 +83,10 @@ x_train_pca = apply_pca(pca_object, x_train)
 x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
-'''
+# '''
 #---gaussian naive bayes predictions---
 
-gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train)
+gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train, count_train/train_len)
 predictions = gauss_nb_classifier.predict(x_val_pca)
 
 print(classification_report(y_val, predictions, target_names=target_names))
@@ -94,8 +94,8 @@ print(classification_report(y_val, predictions, target_names=target_names))
 test_predictions = gauss_nb_classifier.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions_val')
+# '''
 
-'''
 '''
 #---scikit logistic regression---
 
@@ -121,17 +121,17 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 '''
 
+'''
+# ---random forest---
 
-#---random forest---
-
-random_forest_classifier = RandomForestClassifier(max_depth=15, random_state=8, criterion='entropy')
+random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8, criterion='gini')
 random_forest_classifier.fit(x_train_pca, y_train)
 predictions = random_forest_classifier.predict(x_val_pca)
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
 test_predictions = random_forest_classifier.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
-
+'''
 
 
 '''
