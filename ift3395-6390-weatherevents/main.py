@@ -4,11 +4,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, scale, normalize
 from sklearn.decomposition import PCA
 from sklearn.naive_bayes import GaussianNB
-from sklearn.metrics import classification_report
+from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from tensorflow import keras
+from sklearn.feature_selection import SelectKBest, chi2
 
 
 def create_submission_csv(predictions_df, name):
@@ -59,10 +60,10 @@ target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospher
 train = pd.read_csv('train.csv')
 test = pd.read_csv('test.csv')
 
-x_train = train.iloc[:, :-1]
-y_train = train.iloc[:, -1]
+x_all = train.iloc[:, :-1]
+y_all = train.iloc[:, -1]
 
-x_train, x_val, y_train, y_val = train_test_split(x_train, y_train, test_size=0.2, random_state=8)
+x_train, x_val, y_train, y_val = train_test_split(x_all, y_all, test_size=0.2, random_state=8)
 
 train_len = len(y_train)
 val_len = len(y_val)
@@ -70,12 +71,11 @@ value_train, count_train = np.unique(y_train, return_counts=True)
 value_val, count_val = np.unique(y_val, return_counts=True)
 print("train : ")
 for i in range(count_train.shape[0]):
-    print(value_train[i], " : ", count_train[i]/train_len, " %")
+    print(value_train[i], " : ", count_train[i]/train_len, " % (", count_train[i], ")")
 
 print("val : ")
 for i in range(count_val.shape[0]):
-    print(value_val[i], " : ", count_val[i]/val_len, " %")
-
+    print(value_val[i], " : ", count_val[i]/val_len, " % (", count_val[i], ")")
 
 
 pca_object = train_PCA(x_train)
@@ -83,7 +83,7 @@ x_train_pca = apply_pca(pca_object, x_train)
 x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
-# '''
+'''
 #---gaussian naive bayes predictions---
 
 gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train, count_train/train_len)
@@ -134,7 +134,7 @@ create_submission_csv(test_predictions_df, 'predictions')
 '''
 
 
-'''
+# '''
 from numpy.random import seed
 seed(1)
 # from tensorflow import set_random_seed
@@ -143,14 +143,20 @@ seed(1)
 n_features = x_train_pca.shape[1]
 
 dnn = keras.Sequential()
-dnn.add(keras.Input(shape=(n_features,)))
+dnn.add(keras.layers.Dense(128, activation='relu', input_dim=n_features))
 dnn.add(keras.layers.Dense(128, activation='relu'))
-dnn.add(keras.layers.Dense(256, activation='relu'))
+dnn.add(keras.layers.Dense(1024, activation='relu'))
+dnn.add(keras.layers.Dense(2048, activation='relu'))
+dnn.add(keras.layers.Dense(2048, activation='relu'))
+dnn.add(keras.layers.Dense(1024, activation='relu'))
+dnn.add(keras.layers.Dense(128, activation='relu'))
 dnn.add(keras.layers.Dense(1, activation='sigmoid'))
+
 dnn.summary()
 
-adam_optimizer = keras.optimizers.Adam(learning_rate=0.001)
-sgd_optimizer = keras.optimizers.SGD(learning_rate=0.001)
+learning_rate = 0.005
+adam_optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
+sgd_optimizer = keras.optimizers.SGD(learning_rate=learning_rate)
 
 
 dnn.compile(
@@ -161,8 +167,15 @@ dnn.compile(
 
 # callback = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0.001, patience=15,  restore_best_weights=True, mode='auto')
 
-dnn.fit(x_train_pca, y_train, epochs=50, batch_size=16)#, callbacks=[callback])
+dnn.fit(x_train_pca, y_train, epochs=5, batch_size=128)#, callbacks=[callback])
 predictions = dnn.predict(x_val_pca)
-print('Dnn : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
-'''
+print(np.unique(predictions))
+
+print('Dnn : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=0))
+print(confusion_matrix(y_val, predictions))
+
+test_predictions = dnn.predict(test_pca)
+test_predictions_df = pd.DataFrame(test_predictions)
+create_submission_csv(test_predictions_df, 'predictions')
+# '''
 
