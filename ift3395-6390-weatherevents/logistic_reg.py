@@ -34,23 +34,23 @@ class MyLogClassifier :
         return weight_gradient, bias_gradient
 
 
-    def get_t(self, x):
+    def get_y(self, x):
         return self.sigmoid(np.dot(x, self.weights) + self.bias)
 
-    def train(self, x, y, learning_rate=0.01, epochs=500, min_loss=0):
+    def train(self, x, t, learning_rate=0.01, epochs=500, min_loss=0):
         nb_examples, nb_features = x.shape
         self.bias = 0
         self.weights = np.zeros(nb_features)
 
         for i in range(epochs):
-            t = self.get_t(x)
-            weight_gradient, bias_gradient = self.gradient(x, t, y)
+            y = self.get_y(x)
+            weight_gradient, bias_gradient = self.gradient(x=x, t=t, y=y)
 
-            self.weights = learning_rate * weight_gradient
-            self.bias = learning_rate * bias_gradient
+            self.weights -= learning_rate * weight_gradient
+            self.bias -= learning_rate * bias_gradient
 
-            t = self.get_t(x)
-            loss = self.crossentropy(y, t)
+            y = self.get_y(x)
+            loss = self.crossentropy(t=t, y=y)
 
             if min_loss >= loss:
                 break
@@ -59,9 +59,9 @@ class MyLogClassifier :
 
     def predict(self, x, treshold=0.5):
         predictions = np.empty((len(x)))
-        t = self.get_t(x)
+        y = self.get_y(x)
 
-        for i, pred in enumerate(t):
+        for i, pred in enumerate(y):
             predictions[i] = 1 if (pred >= treshold) else 0
 
         return predictions
@@ -73,12 +73,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 
-X, y = make_moons(n_samples=100, noise=0.1)
+X, y = make_moons(n_samples=500, noise=0.1)
 
 x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
 
 log_classifier = MyLogClassifier()
-log_classifier.train(x_train, y_train, epochs=100, learning_rate=0.005)
+log_classifier.train(x=x_train, t=y_train, epochs=1000, learning_rate=0.5)
 predictions = log_classifier.predict(x_val)
 print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
 print(confusion_matrix(y_val, predictions))
