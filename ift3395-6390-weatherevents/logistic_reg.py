@@ -19,10 +19,21 @@ class MyLogClassifier :
         return 1/(1+np.exp(-x))
 
     @staticmethod
-    def crossentropy(t, y):
+    def binary_crossentropy(t, y):
         return (-np.sum(t * np.log(y) + (1-t) * np.log(1-y))) / len(y)# TODO sum or mean ?
         # return np.mean(- (t * np.log(y) + (1-t) * np.log(1-y)))
         # return -np.mean(t*(np.log(y)) - (1-t)*np.log(1-y))
+
+    @staticmethod
+    def crossentropy(t, y):
+        loss = 0
+        n_classes = y.shape[1]
+        for i, t_i in enumerate(t):
+            loss -= (np.log(y[i, t_i]))
+
+        loss = loss / len(t)
+        return loss
+
 
     @staticmethod
     def gradient(x, t, y):
@@ -41,7 +52,7 @@ class MyLogClassifier :
         nb_examples, nb_features = x.shape
         n_classes = len(np.unique(t))
         self.bias = np.zeros(n_classes)
-        self.weights = np.zeros((nb_features, n_classes))
+        self.weights = np.zeros((n_classes, nb_features))
 
         for i in range(epochs):
             y = self.get_y(x)
@@ -56,9 +67,7 @@ class MyLogClassifier :
             self.bias[1] -= learning_rate * bias_gradient_1
 
             y = self.get_y(x)
-            loss_0 = self.crossentropy(t=t, y=y[:, 0])
-            loss_1 = self.crossentropy(t=t, y=y[:, 1])
-            loss = (loss_1 + loss_0) / 2
+            loss = self.crossentropy(t=t, y=y)
 
             if min_loss >= loss:
                 break
@@ -66,12 +75,11 @@ class MyLogClassifier :
             print('epoch : ', i,  ' ------> Loss : ', loss)
 
     def predict(self, x, treshold=0.5):
-        predictions = np.empty((len(x)))
+        predictions = np.empty((len(x)), dtype=np.int)
         y = self.get_y(x)
 
         for i, pred in enumerate(y):
-            best_class = np.argmax(pred)
-            predictions[i] = 1 if (pred[best_class] >= treshold) else 0
+            predictions[i] = np.argmax(pred)
 
         return predictions
 
@@ -82,7 +90,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
 
 
-X, y = make_moons(n_samples=500, noise=0.1)
+X, y = make_moons(n_samples=100, noise=0.1)
 
 x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
 
@@ -99,5 +107,6 @@ predictions_scikit = scikit_classifier.predict(x_val)
 print('scickit log reg : \n', classification_report(y_val, predictions_scikit, zero_division=0))
 print(confusion_matrix(y_val, predictions_scikit))
 
-
+print(predictions)
+print(predictions_scikit)
 
