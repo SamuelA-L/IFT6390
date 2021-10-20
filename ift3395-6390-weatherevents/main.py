@@ -67,10 +67,15 @@ test = pd.read_csv('test.csv', index_col="S.No")
 
 train.drop_duplicates(inplace=True)
 
-x_all = train.iloc[:, :-1]
-y_all = train.iloc[:, -1]
+x_all = train.iloc[:, :-1].to_numpy()
+y_all = train.iloc[:, -1].to_numpy()
 
 x_train, x_val, y_train, y_val = train_test_split(x_all, y_all, test_size=0.2, random_state=8)
+
+x_train = scale(x_train)
+x_val = scale(x_val)
+
+
 
 train_len = len(y_train)
 val_len = len(y_val)
@@ -93,7 +98,7 @@ test_pca = apply_pca(pca_object, test)
 # '''
 #<<<----- My log reg ------>>>
 log_classifier = MyLogClassifier()
-log_classifier.train(x=x_train, t=y_train, epochs=500, learning_rate=0.000001)
+log_classifier.train(x=x_train, t=y_train, epochs=5000, learning_rate=0.05)
 predictions = log_classifier.predict(x_val)
 print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
 print(confusion_matrix(y_val, predictions))
@@ -114,8 +119,8 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions_val')
 # '''
 
-'''
-#---scikit logistic regression---
+# '''
+# ---scikit logistic regression---
 
 logistic_classifier = train_logistic_regression(x_train_pca, y_train, max_iter=500)
 predictions = logistic_classifier.predict(x_val_pca)
@@ -125,7 +130,7 @@ print(classification_report(y_val, predictions))#, target_names=target_names))
 # test_predictions = logistic_classifier.predict(test_pca)
 # test_predictions_df = pd.DataFrame(test_predictions)
 # create_submission_csv(test_predictions_df, 'predictions_')
-'''
+# '''
 
 '''
 #---decision tree---

@@ -48,10 +48,18 @@ class MyLogClassifier :
     def get_y(self, x):
         return self.sigmoid(np.dot(x, self.weights.T) + self.bias)
 
+
+    # def standardize(self,x):
+    #     new_x = np.empty((x.shape))
+    #     for i, x_i in enumerate(x):
+    #         new_x[]
+
+
+
     def train(self, x, t, learning_rate=0.01, epochs=500, min_loss=0):
         nb_examples, nb_features = x.shape
         n_classes = len(np.unique(t))
-        self.bias = np.zeros(n_classes)
+        self.bias = np.random.randn(n_classes)
         self.weights = np.random.rand(n_classes, nb_features)
         t_c = np.empty((n_classes, len(t)))
 
@@ -74,8 +82,8 @@ class MyLogClassifier :
                 loss += self.binary_crossentropy(t=t_c[i], y=y[:, i])
             loss = loss / n_classes
 
-            # if min_loss >= loss:
-            #     break
+            if min_loss >= loss:
+                break
 
             print('epoch : ', epoch,  ' ------> Loss : ', loss)
 
@@ -97,31 +105,31 @@ from sklearn.model_selection import train_test_split
 # X, y = make_moons(n_samples=10000, noise=0.1, random_state=8)
 # x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
 
-data = load_iris()
-X = data['data']
-y = data['target']
-x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
+# data = load_iris()
+# X = data['data']
+# y = data['target']
+# x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
+#
+# def mine():
+#
+#     log_classifier = MyLogClassifier()
+#     log_classifier.train(x=x_train, t=y_train, epochs=3000, learning_rate=0.3)
+#     predictions = log_classifier.predict(x_val)
+#     print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
+#     print(confusion_matrix(y_val, predictions))
+#     print(predictions)
+#
+# def scikit():
+#     from sklearn.linear_model import LogisticRegression
+#     scikit_classifier = LogisticRegression(random_state=8, max_iter=1000)
+#     scikit_classifier.fit(x_train, y_train)
+#     predictions_scikit = scikit_classifier.predict(x_val)
+#     print('scickit log reg : \n', classification_report(y_val, predictions_scikit, zero_division=0))
+#     print(confusion_matrix(y_val, predictions_scikit))
+#
+#
+#     print(predictions_scikit)
 
-def mine():
 
-    log_classifier = MyLogClassifier()
-    log_classifier.train(x=x_train, t=y_train, epochs=3000, learning_rate=0.3)
-    predictions = log_classifier.predict(x_val)
-    print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
-    print(confusion_matrix(y_val, predictions))
-    print(predictions)
-
-def scikit():
-    from sklearn.linear_model import LogisticRegression
-    scikit_classifier = LogisticRegression(random_state=8, max_iter=100)
-    scikit_classifier.fit(x_train, y_train)
-    predictions_scikit = scikit_classifier.predict(x_val)
-    print('scickit log reg : \n', classification_report(y_val, predictions_scikit, zero_division=0))
-    print(confusion_matrix(y_val, predictions_scikit))
-
-
-    print(predictions_scikit)
-
-
-mine()
-scikit()
+# mine()
+# scikit()
