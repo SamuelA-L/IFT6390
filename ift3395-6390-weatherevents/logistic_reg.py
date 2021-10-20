@@ -39,18 +39,26 @@ class MyLogClassifier :
 
     def train(self, x, t, learning_rate=0.01, epochs=500, min_loss=0):
         nb_examples, nb_features = x.shape
-        self.bias = 0
-        self.weights = np.zeros(nb_features)
+        n_classes = len(np.unique(t))
+        self.bias = np.zeros(n_classes)
+        self.weights = np.zeros((nb_features, n_classes))
 
         for i in range(epochs):
             y = self.get_y(x)
-            weight_gradient, bias_gradient = self.gradient(x=x, t=t, y=y)
+            # for i in range(y.shape[1])
+            weight_gradient_0, bias_gradient_0 = self.gradient(x=x, t=t, y=y[:, 0])
+            weight_gradient_1, bias_gradient_1 = self.gradient(x=x, t=t, y=y[:, 1])
+            # weight_gradient_2, bias_gradient_2 = self.gradient(x=x, t=t, y=y[:,2]))
 
-            self.weights -= learning_rate * weight_gradient
-            self.bias -= learning_rate * bias_gradient
+            self.weights[0] -= learning_rate * weight_gradient_0
+            self.weights[1] -= learning_rate * weight_gradient_1
+            self.bias[0] -= learning_rate * bias_gradient_0
+            self.bias[1] -= learning_rate * bias_gradient_1
 
             y = self.get_y(x)
-            loss = self.crossentropy(t=t, y=y)
+            loss_0 = self.crossentropy(t=t, y=y[:, 0])
+            loss_1 = self.crossentropy(t=t, y=y[:, 1])
+            loss = (loss_1 + loss_0) / 2
 
             if min_loss >= loss:
                 break
@@ -62,7 +70,8 @@ class MyLogClassifier :
         y = self.get_y(x)
 
         for i, pred in enumerate(y):
-            predictions[i] = 1 if (pred >= treshold) else 0
+            best_class = np.argmax(pred)
+            predictions[i] = 1 if (pred[best_class] >= treshold) else 0
 
         return predictions
 
