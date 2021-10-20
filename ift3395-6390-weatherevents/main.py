@@ -10,6 +10,7 @@ from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from tensorflow import keras
 from sklearn.feature_selection import SelectKBest, chi2
+from logistic_reg import MyLogClassifier
 
 
 def create_submission_csv(predictions_df, name):
@@ -57,8 +58,14 @@ def train_logistic_regression(x_train, y_train, max_iter=100) :
 # data
 
 target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospheric river']
-train = pd.read_csv('train.csv')
-test = pd.read_csv('test.csv')
+train = pd.read_csv('train.csv', index_col="S.No")
+test = pd.read_csv('test.csv', index_col="S.No")
+
+#-----------------------------------------for 2 classes-----------------------------------------------------------
+# train.drop(train[train['LABELS'] == 2].index, inplace=True)
+
+
+train.drop_duplicates(inplace=True)
 
 x_all = train.iloc[:, :-1]
 y_all = train.iloc[:, -1]
@@ -83,6 +90,17 @@ x_train_pca = apply_pca(pca_object, x_train)
 x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
+# '''
+#<<<----- My log reg ------>>>
+log_classifier = MyLogClassifier()
+log_classifier.train(x=x_train, t=y_train, epochs=500, learning_rate=0.000001)
+predictions = log_classifier.predict(x_val)
+print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
+print(confusion_matrix(y_val, predictions))
+
+# '''
+
+
 '''
 #---gaussian naive bayes predictions---
 
@@ -99,14 +117,14 @@ create_submission_csv(test_predictions_df, 'predictions_val')
 '''
 #---scikit logistic regression---
 
-logistic_classifier = train_logistic_regression(x_train_pca, y_train, max_iter=300)
+logistic_classifier = train_logistic_regression(x_train_pca, y_train, max_iter=500)
 predictions = logistic_classifier.predict(x_val_pca)
 
-print(classification_report(y_val, predictions, target_names=target_names))
+print(classification_report(y_val, predictions))#, target_names=target_names))
 
-test_predictions = logistic_classifier.predict(test_pca)
-test_predictions_df = pd.DataFrame(test_predictions)
-create_submission_csv(test_predictions_df, 'predictions_')
+# test_predictions = logistic_classifier.predict(test_pca)
+# test_predictions_df = pd.DataFrame(test_predictions)
+# create_submission_csv(test_predictions_df, 'predictions_')
 '''
 
 '''
@@ -124,7 +142,7 @@ create_submission_csv(test_predictions_df, 'predictions')
 '''
 # ---random forest---
 
-random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8, criterion='gini')
+random_forest_classifier = RandomForestClassifier(max_depth=11, random_state=8)
 random_forest_classifier.fit(x_train_pca, y_train)
 predictions = random_forest_classifier.predict(x_val_pca)
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
@@ -134,7 +152,7 @@ create_submission_csv(test_predictions_df, 'predictions')
 '''
 
 
-# '''
+'''
 from numpy.random import seed
 seed(1)
 # from tensorflow import set_random_seed
@@ -177,5 +195,5 @@ print(confusion_matrix(y_val, predictions))
 test_predictions = dnn.predict(test_pca)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
-# '''
+'''
 
