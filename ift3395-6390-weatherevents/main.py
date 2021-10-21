@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from tensorflow import keras
+# from tensorflow import keras
 from sklearn.feature_selection import SelectKBest, chi2
 from logistic_reg import MyLogClassifier
 
@@ -102,6 +102,10 @@ log_classifier.train(x=x_train, t=y_train, epochs=5000, learning_rate=0.05)
 predictions = log_classifier.predict(x_val)
 print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
 print(confusion_matrix(y_val, predictions))
+
+test_predictions = log_classifier.predict(test)
+test_predictions_df = pd.DataFrame(test_predictions)
+create_submission_csv(test_predictions_df, 'predictions')
 
 # '''
 
