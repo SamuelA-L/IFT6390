@@ -50,6 +50,7 @@ class MyLogClassifier :
 
 
     def standardize(self,x):
+        x = np.asarray(x)
         m, n = x.shape
         new_x = np.empty((m, n))
         # for i, x_i in enumerate(x.T):
@@ -57,8 +58,8 @@ class MyLogClassifier :
         #     sigma = np.std(x_i)
         #     new_x[:, i] = (x_i - mean) / sigma
         for i in range(n):
-            mean = x[:, i].mean()
-            sigma = x[:, i].std()
+            mean = np.mean(x[:, i])
+            sigma = np.std(x[:, i])
             for j in range(m):
                 new_x[j][i] = (x[j][i] - mean) / sigma
 
@@ -66,7 +67,7 @@ class MyLogClassifier :
 
 
     def train(self, x, t, learning_rate=0.01, epochs=500, min_loss=0):
-        # x = self.standardize(x)
+        x = self.standardize(x)
         nb_examples, nb_features = x.shape
         n_classes = len(np.unique(t))
         self.bias = np.random.randn(n_classes)
@@ -97,7 +98,8 @@ class MyLogClassifier :
 
             print('epoch : ', epoch,  ' ------> Loss : ', loss)
 
-    def predict(self, x, treshold=0.5):
+    def predict(self, x):
+        x = self.standardize(x)
         predictions = np.empty((len(x)), dtype=int)
         y = self.get_y(x)
 
@@ -123,7 +125,7 @@ x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_st
 def mine():
 
     log_classifier = MyLogClassifier()
-    log_classifier.train(x=x_train, t=y_train, epochs=3000, learning_rate=0.3)
+    log_classifier.train(x=x_train, t=y_train, epochs=5000, learning_rate=0.3)
     predictions = log_classifier.predict(x_val)
     print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
     print(confusion_matrix(y_val, predictions))
@@ -140,6 +142,6 @@ def scikit():
 
     print(predictions_scikit)
 
-
+#
 # mine()
 # scikit()

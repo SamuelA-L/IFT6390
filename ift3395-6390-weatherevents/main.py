@@ -49,11 +49,11 @@ def train_gauss_naive_bayes(x_train,y_train, priors=None):
     return classifier
 
 
-def train_logistic_regression(x_train, y_train, max_iter=100) :
-    classifier = LogisticRegression(random_state=8, max_iter=max_iter)
-    classifier.fit(x_train, y_train)
-
-    return classifier
+# def train_logistic_regression(x_train, y_train, max_iter=100) :
+#     classifier = LogisticRegression(random_state=8, max_iter=max_iter)
+#     classifier.fit(x_train, y_train)
+#
+#     return classifier
 
 # data
 
@@ -71,10 +71,6 @@ x_all = train.iloc[:, :-1].to_numpy()
 y_all = train.iloc[:, -1].to_numpy()
 
 x_train, x_val, y_train, y_val = train_test_split(x_all, y_all, test_size=0.2, random_state=8)
-
-x_train = scale(x_train)
-x_val = scale(x_val)
-
 
 
 train_len = len(y_train)
@@ -98,7 +94,7 @@ test_pca = apply_pca(pca_object, test)
 # '''
 #<<<----- My log reg ------>>>
 log_classifier = MyLogClassifier()
-log_classifier.train(x=x_train, t=y_train, epochs=5000, learning_rate=0.05)
+log_classifier.train(x=x_train, t=y_train, epochs=10000, learning_rate=0.99)
 predictions = log_classifier.predict(x_val)
 print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
 print(confusion_matrix(y_val, predictions))
@@ -123,7 +119,7 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions_val')
 # '''
 
-# '''
+'''
 # ---scikit logistic regression---
 
 logistic_classifier = train_logistic_regression(x_train_pca, y_train, max_iter=500)
@@ -134,7 +130,8 @@ print(classification_report(y_val, predictions))#, target_names=target_names))
 # test_predictions = logistic_classifier.predict(test_pca)
 # test_predictions_df = pd.DataFrame(test_predictions)
 # create_submission_csv(test_predictions_df, 'predictions_')
-# '''
+# print(confusion_matrix(y_val, predictions))
+'''
 
 '''
 #---decision tree---
