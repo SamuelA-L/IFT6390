@@ -65,7 +65,7 @@ test = pd.read_csv('test.csv', index_col="S.No")
 # train.drop(train[train['LABELS'] == 2].index, inplace=True)
 
 
-train.drop_duplicates(inplace=True)
+# train.drop_duplicates(inplace=True)
 
 x_all = train.iloc[:, :-1].to_numpy()
 y_all = train.iloc[:, -1].to_numpy()
