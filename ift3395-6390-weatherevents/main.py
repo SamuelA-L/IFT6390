@@ -8,9 +8,11 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-# from tensorflow import keras
+from tensorflow import keras
 from sklearn.feature_selection import SelectKBest, chi2
 from logistic_reg import MyLogClassifier
+from sklearn.svm import SVC
+
 
 
 def create_submission_csv(predictions_df, name):
@@ -49,21 +51,12 @@ def train_gauss_naive_bayes(x_train,y_train, priors=None):
     return classifier
 
 
-# def train_logistic_regression(x_train, y_train, max_iter=100) :
-#     classifier = LogisticRegression(random_state=8, max_iter=max_iter)
-#     classifier.fit(x_train, y_train)
-#
-#     return classifier
 
 # data
 
 target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospheric river']
 train = pd.read_csv('train.csv', index_col="S.No")
 test = pd.read_csv('test.csv', index_col="S.No")
-
-#-----------------------------------------for 2 classes-----------------------------------------------------------
-# train.drop(train[train['LABELS'] == 2].index, inplace=True)
-
 
 # train.drop_duplicates(inplace=True)
 
@@ -91,7 +84,7 @@ x_train_pca = apply_pca(pca_object, x_train)
 x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
-# '''
+'''
 #<<<----- My log reg ------>>>
 log_classifier = MyLogClassifier()
 log_classifier.train(x=x_train, t=y_train, epochs=10000, learning_rate=0.99)
@@ -103,7 +96,7 @@ test_predictions = log_classifier.predict(test)
 test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 
-# '''
+'''
 
 
 '''
@@ -122,7 +115,9 @@ create_submission_csv(test_predictions_df, 'predictions_val')
 '''
 # ---scikit logistic regression---
 
-logistic_classifier = train_logistic_regression(x_train_pca, y_train, max_iter=500)
+
+logistic_classifier = LogisticRegression(random_state=8, max_iter=500)
+logistic_classifier.fit(x_train_pca, y_train)
 predictions = logistic_classifier.predict(x_val_pca)
 
 print(classification_report(y_val, predictions))#, target_names=target_names))
@@ -168,10 +163,9 @@ n_features = x_train_pca.shape[1]
 
 dnn = keras.Sequential()
 dnn.add(keras.layers.Dense(128, activation='relu', input_dim=n_features))
-dnn.add(keras.layers.Dense(128, activation='relu'))
 dnn.add(keras.layers.Dense(1024, activation='relu'))
 dnn.add(keras.layers.Dense(2048, activation='relu'))
-dnn.add(keras.layers.Dense(2048, activation='relu'))
+# dnn.add(keras.layers.Dense(2048, activation='relu'))
 dnn.add(keras.layers.Dense(1024, activation='relu'))
 dnn.add(keras.layers.Dense(128, activation='relu'))
 dnn.add(keras.layers.Dense(1, activation='sigmoid'))
@@ -203,3 +197,17 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 '''
 
+# '''
+
+# ----- SVM -----
+svm_classifier = SVC()
+svm_classifier.fit(x_train_pca, y_train)
+predictions = svm_classifier.predict(x_val_pca)
+print('SVM : \n', classification_report(y_val, predictions, zero_division=0))
+print(confusion_matrix(y_val, predictions))
+
+test_predictions = svm_classifier.predict(test_pca)
+test_predictions_df = pd.DataFrame(test_predictions)
+create_submission_csv(test_predictions_df, 'predictions')
+
+# '''
