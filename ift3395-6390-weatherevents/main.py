@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, scale, normalize
+from sklearn.preprocessing import StandardScaler, scale, normalize, OneHotEncoder
 from sklearn.decomposition import PCA
 from sklearn.naive_bayes import GaussianNB
 from sklearn.metrics import classification_report, confusion_matrix
@@ -11,7 +11,7 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from tensorflow import keras
 from sklearn.feature_selection import SelectKBest, chi2
 from logistic_reg import MyLogClassifier
-from sklearn.svm import SVC
+from sklearn.svm import SVC, NuSVC
 
 
 
@@ -99,34 +99,34 @@ create_submission_csv(test_predictions_df, 'predictions')
 '''
 
 
-'''
+# '''
 #---gaussian naive bayes predictions---
 
-gauss_nb_classifier = train_gauss_naive_bayes(x_train_pca, y_train, count_train/train_len)
-predictions = gauss_nb_classifier.predict(x_val_pca)
+gauss_nb_classifier = train_gauss_naive_bayes(scale(x_train), y_train, count_train/train_len)
+predictions = gauss_nb_classifier.predict(scale(x_val))
 
 print(classification_report(y_val, predictions, target_names=target_names))
 
-test_predictions = gauss_nb_classifier.predict(test_pca)
-test_predictions_df = pd.DataFrame(test_predictions)
-create_submission_csv(test_predictions_df, 'predictions_val')
+test_predictions_gnb = gauss_nb_classifier.predict(scale(test))
+# test_predictions_df = pd.DataFrame(test_predictions)
+# create_submission_csv(test_predictions_df, 'predictions_val')
 # '''
 
-'''
+# '''
 # ---scikit logistic regression---
 
 
 logistic_classifier = LogisticRegression(random_state=8, max_iter=500)
-logistic_classifier.fit(x_train_pca, y_train)
-predictions = logistic_classifier.predict(x_val_pca)
+logistic_classifier.fit(scale(x_train), y_train)
+predictions = logistic_classifier.predict(scale(x_val))
 
 print(classification_report(y_val, predictions))#, target_names=target_names))
 
-# test_predictions = logistic_classifier.predict(test_pca)
+test_predictions_lc = logistic_classifier.predict(scale(test))
 # test_predictions_df = pd.DataFrame(test_predictions)
 # create_submission_csv(test_predictions_df, 'predictions_')
 # print(confusion_matrix(y_val, predictions))
-'''
+# '''
 
 '''
 #---decision tree---
@@ -140,17 +140,18 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 '''
 
-'''
+# '''
 # ---random forest---
 
 random_forest_classifier = RandomForestClassifier(max_depth=11, random_state=8)
-random_forest_classifier.fit(x_train_pca, y_train)
-predictions = random_forest_classifier.predict(x_val_pca)
+random_forest_classifier.fit(scale(x_train), y_train)
+predictions = random_forest_classifier.predict(scale(x_val))
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
-test_predictions = random_forest_classifier.predict(test_pca)
-test_predictions_df = pd.DataFrame(test_predictions)
-create_submission_csv(test_predictions_df, 'predictions')
-'''
+
+test_predictions_rf = random_forest_classifier.predict(scale(test))
+# test_predictions_df = pd.DataFrame(test_predictions)
+# create_submission_csv(test_predictions_df, 'predictions')
+# '''
 
 
 '''
@@ -200,14 +201,28 @@ create_submission_csv(test_predictions_df, 'predictions')
 # '''
 
 # ----- SVM -----
-svm_classifier = SVC()
-svm_classifier.fit(x_train_pca, y_train)
-predictions = svm_classifier.predict(x_val_pca)
+svm_classifier = SVC(decision_function_shape='ovo')
+svm_classifier.fit(scale(x_train), y_train)
+predictions = svm_classifier.predict(scale(x_val))
 print('SVM : \n', classification_report(y_val, predictions, zero_division=0))
 print(confusion_matrix(y_val, predictions))
 
-test_predictions = svm_classifier.predict(test_pca)
-test_predictions_df = pd.DataFrame(test_predictions)
-create_submission_csv(test_predictions_df, 'predictions')
+test_predictions_svm = svm_classifier.predict(scale(test))
+# test_predictions_df = pd.DataFrame(test_predictions)
+# create_submission_csv(test_predictions_df, 'predictions')
 
 # '''
+
+
+comb_pred = np.zeros((len(test_predictions_gnb), 3))
+for i in range(len(test_predictions_gnb)):
+    comb_pred[i][test_predictions_gnb] += 1
+    comb_pred[i][test_predictions_lc] += 1
+    comb_pred[i][test_predictions_rf] += 1
+    comb_pred[i][test_predictions_svm] += 1
+
+predictions = np.argmax(comb_pred, axis=1)
+test_predictions_df = pd.DataFrame(predictions)
+create_submission_csv(test_predictions_df, 'predictions')
+
+print("")
