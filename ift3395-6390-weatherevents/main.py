@@ -216,10 +216,10 @@ test_predictions_svm = svm_classifier.predict(scale(test))
 
 comb_pred = np.zeros((len(test_predictions_gnb), 3))
 for i in range(len(test_predictions_gnb)):
-    comb_pred[i][test_predictions_gnb] += 1
-    comb_pred[i][test_predictions_lc] += 1
-    comb_pred[i][test_predictions_rf] += 1
-    comb_pred[i][test_predictions_svm] += 1
+    comb_pred[i][test_predictions_gnb[i]] += 1
+    comb_pred[i][test_predictions_lc[i]] += 1
+    comb_pred[i][test_predictions_rf[i]] += 1
+    comb_pred[i][test_predictions_svm[i]] += 1
 
 predictions = np.argmax(comb_pred, axis=1)
 test_predictions_df = pd.DataFrame(predictions)
