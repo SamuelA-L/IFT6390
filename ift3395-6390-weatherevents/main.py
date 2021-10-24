@@ -58,7 +58,7 @@ target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospher
 train = pd.read_csv('train.csv', index_col="S.No")
 test = pd.read_csv('test.csv', index_col="S.No")
 
-train.drop_duplicates(inplace=True)
+# train.drop_duplicates(inplace=True)
 
 x_all = train.iloc[:, :-1].to_numpy()
 y_all = train.iloc[:, -1].to_numpy()
