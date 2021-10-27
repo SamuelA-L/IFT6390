@@ -58,7 +58,9 @@ target_names = ['Standard background conditions', 'Tropical cyclone', 'Atmospher
 train = pd.read_csv('train.csv', index_col="S.No")
 test = pd.read_csv('test.csv', index_col="S.No")
 
+'''
 # train.drop_duplicates(inplace=True)
+'''
 
 x_all = train.iloc[:, :-1].to_numpy()
 y_all = train.iloc[:, -1].to_numpy()
@@ -140,7 +142,7 @@ test_predictions_df = pd.DataFrame(test_predictions)
 create_submission_csv(test_predictions_df, 'predictions')
 '''
 
-# '''
+'''
 # ---random forest---
 
 random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8, n_estimators=500)
@@ -151,9 +153,24 @@ print('Random Forest : \n', classification_report(y_val, predictions, target_nam
 test_predictions_rf = random_forest_classifier.predict(scale(test))
 test_predictions_df = pd.DataFrame(test_predictions_rf)
 create_submission_csv(test_predictions_df, 'predictions')
-# '''
+'''
+
+#'''
+# gradient boosting
+
+grad_boost_classifier = GradientBoostingClassifier(max_depth=8, random_state=8, n_estimators=300, learning_rate=0.1, min_samples_leaf=5)
+# grad_boost_classifier = GradientBoostingClassifier(max_depth=5, random_state=8, n_estimators=200, learning_rate=0.1)
+grad_boost_classifier.fit(scale(x_train), y_train)
+predictions = grad_boost_classifier.predict(scale(x_val))
+print('gradient boosting : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
+
+test_predictions_gb = grad_boost_classifier.predict(scale(test))
+test_predictions_gb = pd.DataFrame(test_predictions_gb)
+create_submission_csv(test_predictions_gb, 'predictions')
 
 
+
+#'''
 '''
 from numpy.random import seed
 seed(1)
