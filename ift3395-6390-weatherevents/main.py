@@ -8,7 +8,7 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.linear_model import LogisticRegression
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
-from tensorflow import keras
+# from tensorflow import keras
 from sklearn.feature_selection import SelectKBest, chi2
 from logistic_reg import MyLogClassifier
 from sklearn.svm import SVC, NuSVC
@@ -17,6 +17,8 @@ from sklearn.svm import SVC, NuSVC
 
 def create_submission_csv(predictions_df, name):
     submission_file = open("./" + name + ".csv", "w")
+    predictions_df.index.name = 'S.No'
+    predictions_df.columns = ['LABELS']
     predictions_df.to_csv(submission_file, index=True)
     submission_file.close()
 
@@ -158,8 +160,8 @@ create_submission_csv(test_predictions_df, 'predictions')
 #'''
 # gradient boosting
 
-grad_boost_classifier = GradientBoostingClassifier(max_depth=8, random_state=8, n_estimators=300, learning_rate=0.1, min_samples_leaf=5)
-# grad_boost_classifier = GradientBoostingClassifier(max_depth=5, random_state=8, n_estimators=200, learning_rate=0.1)
+# grad_boost_classifier = GradientBoostingClassifier(max_depth=8, random_state=8, n_estimators=300, learning_rate=0.1, min_samples_leaf=5)
+grad_boost_classifier = GradientBoostingClassifier(random_state=1, n_estimators=300)
 grad_boost_classifier.fit(scale(x_train), y_train)
 predictions = grad_boost_classifier.predict(scale(x_val))
 print('gradient boosting : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
