@@ -161,7 +161,7 @@ create_submission_csv(test_predictions_df, 'predictions')
 # gradient boosting
 
 # grad_boost_classifier = GradientBoostingClassifier(max_depth=8, random_state=8, n_estimators=300, learning_rate=0.1, min_samples_leaf=5)
-grad_boost_classifier = GradientBoostingClassifier(random_state=1, n_estimators=300, min_samples_leaf=10)
+grad_boost_classifier = GradientBoostingClassifier(random_state=1, n_estimators=500, min_samples_leaf=25)
 grad_boost_classifier.fit(scale(x_train), y_train)
 predictions = grad_boost_classifier.predict(scale(x_val))
 print('gradient boosting : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
