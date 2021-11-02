@@ -1,13 +1,4 @@
 import numpy as np
-import pandas as pd
-from scipy import sparse
-import matplotlib.pyplot as plt
-'''
-this code was written with the help of :
--https://machinelearningmastery.com/implement-logistic-regression-stochastic-gradient-descent-scratch-python/
--https://medium.com/@martinpella/logistic-regression-from-scratch-in-python-124c5636b8ac
--https://towardsdatascience.com/logistic-regression-from-scratch-in-python-ec66603592e2
-'''
 
 class MyLogClassifier :
     def __init__(self):
@@ -16,13 +7,14 @@ class MyLogClassifier :
 
     @staticmethod
     def sigmoid(x):
+
         return 1/(1+np.exp(-x))
 
     @staticmethod
     def binary_crossentropy(t, y):
+
         return (-np.sum(t * np.log(y) + (1-t) * np.log(1-y))) / len(y)# TODO sum or mean ?
-        # return np.mean(- (t * np.log(y) + (1-t) * np.log(1-y)))
-        # return -np.mean(t*(np.log(y)) - (1-t)*np.log(1-y))
+
 
     @staticmethod
     def crossentropy(t, y):
@@ -37,8 +29,8 @@ class MyLogClassifier :
 
     @staticmethod
     def gradient(x, t, y):
-        nb_examples = len(x)
 
+        nb_examples = len(x)
         weight_gradient = np.dot(x.T, (y-t)) / nb_examples
         bias_gradient = np.sum((y-t)) / nb_examples
 
@@ -46,6 +38,7 @@ class MyLogClassifier :
 
 
     def get_y(self, x):
+
         return self.sigmoid(np.dot(x, self.weights.T) + self.bias)
 
 
@@ -53,10 +46,7 @@ class MyLogClassifier :
         x = np.asarray(x)
         m, n = x.shape
         new_x = np.empty((m, n))
-        # for i, x_i in enumerate(x.T):
-        #     mean = np.mean(x_i)
-        #     sigma = np.std(x_i)
-        #     new_x[:, i] = (x_i - mean) / sigma
+
         for i in range(n):
             mean = np.mean(x[:, i])
             sigma = np.std(x[:, i])
@@ -65,8 +55,8 @@ class MyLogClassifier :
 
         return new_x
 
-
     def train(self, x, t, learning_rate=0.01, epochs=500, min_loss=0):
+
         x = self.standardize(x)
         nb_examples, nb_features = x.shape
         n_classes = len(np.unique(t))
@@ -83,22 +73,23 @@ class MyLogClassifier :
 
             for i in range(n_classes):
                 w_gradient, b_gradient = self.gradient(x=x, t=t_c[i], y=y[:, i])
-
                 self.weights[i] -= learning_rate * w_gradient
                 self.bias[i] -= learning_rate * b_gradient
 
             y = self.get_y(x)
             loss = 0
+
             for i in range(n_classes):
                 loss += self.binary_crossentropy(t=t_c[i], y=y[:, i])
+
             loss = loss / n_classes
 
             if min_loss >= loss:
                 break
-
             print('epoch : ', epoch,  ' ------> Loss : ', loss)
 
     def predict(self, x):
+
         x = self.standardize(x)
         predictions = np.empty((len(x)), dtype=int)
         y = self.get_y(x)
@@ -108,6 +99,8 @@ class MyLogClassifier :
 
         return predictions
 
+
+# functions to test binary and multiclass logistic regression on smaller and simpler datasets (debugging)
 
 from sklearn.datasets import make_moons, load_iris
 from sklearn.metrics import classification_report, confusion_matrix
@@ -142,6 +135,6 @@ def scikit():
 
     print(predictions_scikit)
 
-#
+
 # mine()
 # scikit()

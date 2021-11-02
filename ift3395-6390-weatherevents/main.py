@@ -230,3 +230,4 @@ def svm():
 # test_predictions_df = pd.DataFrame(predictions)
 # create_submission_csv(test_predictions_df, 'predictions')
 #
+my_logistic_reg()
