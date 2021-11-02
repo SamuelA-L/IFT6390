@@ -147,7 +147,7 @@ create_submission_csv(test_predictions_df, 'predictions')
 # '''
 # ---random forest---
 
-random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8, n_estimators=500, min_samples_leaf=50)
+random_forest_classifier = RandomForestClassifier(max_depth=12, random_state=8, n_estimators=200, min_samples_leaf=25)
 random_forest_classifier.fit(scale(x_train), y_train)
 predictions = random_forest_classifier.predict(scale(x_val))
 print('Random Forest : \n', classification_report(y_val, predictions, target_names=target_names, zero_division=1))
@@ -245,4 +245,3 @@ test_predictions_svm = svm_classifier.predict(scale(test))
 # test_predictions_df = pd.DataFrame(predictions)
 # create_submission_csv(test_predictions_df, 'predictions')
 #
-# print("")
