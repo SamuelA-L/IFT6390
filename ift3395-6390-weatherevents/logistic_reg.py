@@ -13,19 +13,17 @@ class MyLogClassifier :
     @staticmethod
     def binary_crossentropy(t, y):
 
-        return (-np.sum(t * np.log(y) + (1-t) * np.log(1-y))) / len(y)# TODO sum or mean ?
-
+        return (-np.sum(t * np.log(y) + (1-t) * np.log(1-y))) / len(y)
 
     @staticmethod
     def crossentropy(t, y):
         loss = 0
-        n_classes = y.shape[1]
         for i, t_i in enumerate(t):
             loss -= (np.log(y[i, t_i]))
 
         loss = loss / len(t)
-        return loss
 
+        return loss
 
     @staticmethod
     def gradient(x, t, y):
@@ -36,13 +34,11 @@ class MyLogClassifier :
 
         return weight_gradient, bias_gradient
 
-
     def get_y(self, x):
 
         return self.sigmoid(np.dot(x, self.weights.T) + self.bias)
 
-
-    def standardize(self,x):
+    def standardize(self, x):
         x = np.asarray(x)
         m, n = x.shape
         new_x = np.empty((m, n))
@@ -98,43 +94,3 @@ class MyLogClassifier :
             predictions[i] = np.argmax(pred)
 
         return predictions
-
-
-# functions to test binary and multiclass logistic regression on smaller and simpler datasets (debugging)
-
-from sklearn.datasets import make_moons, load_iris
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.model_selection import train_test_split
-
-
-X, y = make_moons(n_samples=10000, noise=0.1, random_state=8)
-x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
-
-data = load_iris()
-X = data['data']
-y = data['target']
-x_train, x_val, y_train, y_val = train_test_split(X, y, test_size=0.2, random_state=8)
-
-def mine():
-
-    log_classifier = MyLogClassifier()
-    log_classifier.train(x=x_train, t=y_train, epochs=5000, learning_rate=0.3)
-    predictions = log_classifier.predict(x_val)
-    print('My log reg : \n', classification_report(y_val, predictions, zero_division=0))
-    print(confusion_matrix(y_val, predictions))
-    print(predictions)
-
-def scikit():
-    from sklearn.linear_model import LogisticRegression
-    scikit_classifier = LogisticRegression(random_state=8, max_iter=1000)
-    scikit_classifier.fit(x_train, y_train)
-    predictions_scikit = scikit_classifier.predict(x_val)
-    print('scickit log reg : \n', classification_report(y_val, predictions_scikit, zero_division=0))
-    print(confusion_matrix(y_val, predictions_scikit))
-
-
-    print(predictions_scikit)
-
-
-# mine()
-# scikit()
