@@ -104,11 +104,11 @@ def gaussian_naive_bayes():
 
     gauss_nb_classifier = train_gauss_naive_bayes(scale(x_train), y_train, count_train/train_len)
     predictions = gauss_nb_classifier.predict(scale(x_val))
-    print(classification_report(y_val, predictions, target_names=target_names))
+    print('Naive Bayes : \n', classification_report(y_val, predictions, target_names=target_names))
 
     test_predictions_gnb = gauss_nb_classifier.predict(scale(test))
     test_predictions_df = pd.DataFrame(test_predictions_gnb)
-    create_submission_csv(test_predictions_df, 'predictions_val')
+    create_submission_csv(test_predictions_df, 'prediction')
 
     return test_predictions_gnb
 
@@ -118,7 +118,7 @@ def scikit_logistic_reg():
     logistic_classifier = LogisticRegression(random_state=8, max_iter=500)
     logistic_classifier.fit(scale(x_train), y_train)
     predictions = logistic_classifier.predict(scale(x_val))
-    print(classification_report(y_val, predictions))
+    print('Scikit log reg : \n', classification_report(y_val, predictions))
 
     test_predictions_lc = logistic_classifier.predict(scale(test))
     test_predictions_df = pd.DataFrame(test_predictions_lc)
@@ -130,7 +130,7 @@ def scikit_logistic_reg():
 
 def decision_tree():
 
-    decision_tree_classifier = DecisionTreeClassifier(random_state=8)
+    decision_tree_classifier = DecisionTreeClassifier(random_state=8, max_depth=12)
     decision_tree_classifier.fit(x_train, y_train)
     predictions = decision_tree_classifier.predict(x_val)
     print('Decision Tree :\n', classification_report(y_val, predictions, target_names=target_names))
@@ -156,7 +156,7 @@ def random_forest():
     return test_predictions_rf
 
 
-def gradient_boosting() :
+def gradient_boosting():
 
     grad_boost_classifier = GradientBoostingClassifier(max_depth=8, random_state=8, n_estimators=300, learning_rate=0.1, min_samples_leaf=5)
     grad_boost_classifier.fit(x_train, y_train)
@@ -170,12 +170,9 @@ def gradient_boosting() :
     return test_predictions_gb
 
 
-def dnn() :
+def dnn():
     from numpy.random import seed
     seed(1)
-    # from tensorflow import set_random_seed
-    # set_random_seed(2)
-
     n_features = x_train_pca.shape[1]
 
     dnn = keras.Sequential()
@@ -192,7 +189,6 @@ def dnn() :
     learning_rate = 0.005
     adam_optimizer = keras.optimizers.Adam(learning_rate=learning_rate)
     sgd_optimizer = keras.optimizers.SGD(learning_rate=learning_rate)
-
 
     dnn.compile(
         optimizer=adam_optimizer,
@@ -236,6 +232,7 @@ def combine_predictions():
     test_predictions_rf = random_forest()
     test_predictions_svm = svm()
     comb_pred = np.zeros((len(test_predictions_gnb), 3))
+
     for i in range(len(test_predictions_gnb)):
         comb_pred[i][test_predictions_gnb[i]] += 1
         comb_pred[i][test_predictions_lc[i]] += 1
@@ -245,3 +242,13 @@ def combine_predictions():
     predictions = np.argmax(comb_pred, axis=1)
     test_predictions_df = pd.DataFrame(predictions)
     create_submission_csv(test_predictions_df, 'predictions')
+
+# my_logistic_reg()
+# gaussian_naive_bayes()
+# scikit_logistic_reg()
+# decision_tree()
+# random_forest()
+# gradient_boosting()
+# dnn()
+# svm()
+#combine_predictions()
