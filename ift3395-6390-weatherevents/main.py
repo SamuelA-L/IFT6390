@@ -13,7 +13,6 @@ from logistic_reg import MyLogClassifier
 from sklearn.svm import SVC
 
 
-
 def create_submission_csv(predictions_df, name):
     submission_file = open("./" + name + ".csv", "w")
     predictions_df.index.name = 'S.No'
@@ -88,7 +87,7 @@ x_val_pca = apply_pca(pca_object, x_val)
 test_pca = apply_pca(pca_object, test)
 
 
-def my_logistic_reg() :
+def my_logistic_reg():
 
     log_classifier = MyLogClassifier()
     log_classifier.train(x=x_train, t=y_train, epochs=10000, learning_rate=0.99)
@@ -101,7 +100,7 @@ def my_logistic_reg() :
     create_submission_csv(test_predictions_df, 'predictions')
 
 
-def gaussian_naive_bayes() :
+def gaussian_naive_bayes():
 
     gauss_nb_classifier = train_gauss_naive_bayes(scale(x_train), y_train, count_train/train_len)
     predictions = gauss_nb_classifier.predict(scale(x_val))
@@ -110,6 +109,8 @@ def gaussian_naive_bayes() :
     test_predictions_gnb = gauss_nb_classifier.predict(scale(test))
     test_predictions_df = pd.DataFrame(test_predictions_gnb)
     create_submission_csv(test_predictions_df, 'predictions_val')
+
+    return test_predictions_gnb
 
 
 def scikit_logistic_reg():
@@ -124,6 +125,8 @@ def scikit_logistic_reg():
     create_submission_csv(test_predictions_df, 'predictions')
     print(confusion_matrix(y_val, predictions))
 
+    return test_predictions_lc
+
 
 def decision_tree():
 
@@ -135,6 +138,8 @@ def decision_tree():
     test_predictions = decision_tree_classifier.predict(test)
     test_predictions_df = pd.DataFrame(test_predictions)
     create_submission_csv(test_predictions_df, 'predictions')
+
+    return test_predictions
 
 
 def random_forest():
@@ -148,6 +153,8 @@ def random_forest():
     test_predictions_df = pd.DataFrame(test_predictions_rf)
     create_submission_csv(test_predictions_df, 'predictions')
 
+    return test_predictions_rf
+
 
 def gradient_boosting() :
 
@@ -159,6 +166,8 @@ def gradient_boosting() :
     test_predictions_gb = grad_boost_classifier.predict(test)
     test_predictions_gb = pd.DataFrame(test_predictions_gb)
     create_submission_csv(test_predictions_gb, 'predictions')
+
+    return test_predictions_gb
 
 
 def dnn() :
@@ -217,17 +226,22 @@ def svm():
     test_predictions_df = pd.DataFrame(test_predictions_svm)
     create_submission_csv(test_predictions_df, 'predictions')
 
+    return test_predictions_svm
 
 
-# comb_pred = np.zeros((len(test_predictions_gnb), 3))
-# for i in range(len(test_predictions_gnb)):
-#     comb_pred[i][test_predictions_gnb[i]] += 1
-#     comb_pred[i][test_predictions_lc[i]] += 1
-#     comb_pred[i][test_predictions_rf[i]] += 1
-#     comb_pred[i][test_predictions_svm[i]] += 1
-#
-# predictions = np.argmax(comb_pred, axis=1)
-# test_predictions_df = pd.DataFrame(predictions)
-# create_submission_csv(test_predictions_df, 'predictions')
-#
-my_logistic_reg()
+def combine_predictions():
+
+    test_predictions_gnb = gaussian_naive_bayes()
+    test_predictions_lc = scikit_logistic_reg()
+    test_predictions_rf = random_forest()
+    test_predictions_svm = svm()
+    comb_pred = np.zeros((len(test_predictions_gnb), 3))
+    for i in range(len(test_predictions_gnb)):
+        comb_pred[i][test_predictions_gnb[i]] += 1
+        comb_pred[i][test_predictions_lc[i]] += 1
+        comb_pred[i][test_predictions_rf[i]] += 1
+        comb_pred[i][test_predictions_svm[i]] += 1
+
+    predictions = np.argmax(comb_pred, axis=1)
+    test_predictions_df = pd.DataFrame(predictions)
+    create_submission_csv(test_predictions_df, 'predictions')
