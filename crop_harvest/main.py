@@ -33,17 +33,17 @@ x_test = test.to_numpy()
 x = train.iloc[:, :-1].to_numpy()
 y = train.iloc[:, -1].to_numpy()
 counts = np.unique(y, return_counts=True)
-print(counts[0][0], ' : ', counts[1][0], '  |  ', counts[0][1], ' : ', counts[1][1])
+print('class distribution on training data \n', int(counts[0][0]), ' : ', counts[1][0], '  |  ', int(counts[0][1]), ' : ', counts[1][1])
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=1)
 
 
 
-boost = GradientBoostingClassifier()
-boost_pca_pipeline = make_pca_pipeline(boost)
-train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
-create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
+# boost = GradientBoostingClassifier()
+# boost_pca_pipeline = make_pca_pipeline(boost)
+# train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
+# create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
 
-# forest = RandomForestClassifier()
-# train_and_eval(forest, x_train, y_train, x_val, y_val)
-# create_submission_file(forest.predict(x_test).astype(int))
+forest = RandomForestClassifier()
+train_and_eval(forest, x_train, y_train, x_val, y_val)
+create_submission_file(forest.predict(x_test).astype(int))
