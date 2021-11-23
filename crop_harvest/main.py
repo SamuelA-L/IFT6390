@@ -38,10 +38,10 @@ x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_st
 
 
 
-# boost = GradientBoostingClassifier()
-# boost_pca_pipeline = make_pca_pipeline(boost)
-# train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
-# create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
+boost = GradientBoostingClassifier()
+boost_pca_pipeline = make_pca_pipeline(boost)
+train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
+create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
 
 # forest = RandomForestClassifier()
