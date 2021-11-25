@@ -43,9 +43,18 @@ x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_st
 # # train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
 # # create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
+# #find best hyperparams
+# for i in [None, 50]:
+#     for j in [50, 100, 200]:
+#         for k in [1, 10, 50]:
+#             print('max_dept : ', i, " n_estimators : ", j, " min sample leaf : ", k)
+#             forest = RandomForestClassifier(random_state=1, max_depth=i, n_estimators=j, min_samples_leaf=k)
+#             train_and_eval(forest, x_train, y_train, x_val, y_val)
 
-# forest = RandomForestClassifier(random_state=1, n_estimators=300)
-# train_and_eval(forest, x_train, y_train, x_val, y_val)
+# best found none 200 1
+# best found 50 200 1
+forest = RandomForestClassifier(random_state=1, max_depth=None, n_estimators=200, min_samples_leaf=1)
+train_and_eval(forest, x_train, y_train, x_val, y_val)
 # create_submission_file(forest.predict(x_test).astype(int))
 
 
@@ -54,6 +63,17 @@ x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_st
 # create_submission_file(ada_boost.predict(x_test).astype(int))
 
 
-xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False)
+'''
+# find best hyper params
+for i in [2, 4, 6, 8, 10]:
+    for j in [50, 100, 150, 200]:
+        print('max_dept : ', i , " n_estimators : ", j)
+        xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=j, max_depth=i)
+        train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
+
+# best hyperparams found : 8 max_dept, 200 estimators
+
+xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8)
 train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
 create_submission_file(xg_boost.predict(x_test).astype(int))
+'''
