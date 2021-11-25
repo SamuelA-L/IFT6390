@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, scale
 from sklearn.decomposition import PCA
 from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
 
 
@@ -37,13 +37,18 @@ print('class distribution on training data \n', int(counts[0][0]), ' : ', counts
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=1)
 
 
+# boost = GradientBoostingClassifier(random_state=1)
+# train_and_eval(boost, x_train, y_train, x_val, y_val)
+# # boost_pca_pipeline = make_pca_pipeline(boost)
+# # train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
+# # create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
-# boost = GradientBoostingClassifier()
-# boost_pca_pipeline = make_pca_pipeline(boost)
-# train_and_eval(boost_pca_pipeline, x_train, y_train, x_val, y_val)
-# create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
-
-forest = RandomForestClassifier()
+forest = RandomForestClassifier(random_state=1, n_estimators=300)
 train_and_eval(forest, x_train, y_train, x_val, y_val)
 create_submission_file(forest.predict(x_test).astype(int))
+
+
+# ada_boost = AdaBoostClassifier(random_state=1)
+# train_and_eval(ada_boost, x_train, y_train, x_val, y_val)
+# create_submission_file(forest.predict(x_test).astype(int))
