@@ -6,7 +6,7 @@ from sklearn.decomposition import PCA
 from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
-
+import xgboost as xgb
 
 
 def create_submission_file(predictions, name='predictions'):
@@ -44,11 +44,16 @@ x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_st
 # # create_submission_file(boost_pca_pipeline.predict(x_test).astype(int))
 
 
-forest = RandomForestClassifier(random_state=1, n_estimators=300)
-train_and_eval(forest, x_train, y_train, x_val, y_val)
-create_submission_file(forest.predict(x_test).astype(int))
-
-
-# ada_boost = AdaBoostClassifier(random_state=1)
-# train_and_eval(ada_boost, x_train, y_train, x_val, y_val)
+# forest = RandomForestClassifier(random_state=1, n_estimators=300)
+# train_and_eval(forest, x_train, y_train, x_val, y_val)
 # create_submission_file(forest.predict(x_test).astype(int))
+
+
+# ada_boost = AdaBoostClassifier(random_state=1, n_estimators=250, learning_rate=1.5)
+# train_and_eval(ada_boost, x_train, y_train, x_val, y_val)
+# create_submission_file(ada_boost.predict(x_test).astype(int))
+
+
+xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False)
+train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
+create_submission_file(xg_boost.predict(x_test).astype(int))
