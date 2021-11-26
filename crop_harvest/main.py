@@ -55,7 +55,7 @@ x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_st
 # best found 50 200 1
 forest = RandomForestClassifier(random_state=1, max_depth=None, n_estimators=200, min_samples_leaf=1)
 train_and_eval(forest, x_train, y_train, x_val, y_val)
-# create_submission_file(forest.predict(x_test).astype(int))
+create_submission_file(forest.predict(x_test).astype(int))
 
 
 # ada_boost = AdaBoostClassifier(random_state=1, n_estimators=250, learning_rate=1.5)
