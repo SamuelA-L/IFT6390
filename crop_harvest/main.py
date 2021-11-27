@@ -7,6 +7,8 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
+from sklearn.model_selection import KFold
+
 
 
 def create_submission_file(predictions, name='predictions'):
@@ -73,7 +75,16 @@ for i in [2, 4, 6, 8, 10]:
 
 # best hyperparams found : 8 max_dept, 200 estimators
 
-xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8)
-train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
-create_submission_file(xg_boost.predict(x_test).astype(int))
+# xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8)
+# train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
+# create_submission_file(xg_boost.predict(x_test).astype(int))
 
+
+kf = KFold(n_splits=5, random_state=1, shuffle=True)
+
+for train_index, test_index in kf.split(x):
+     print("TRAIN:", len(train_index), "TEST:", len(test_index))
+     x_train_fold, x_val_fold = x[train_index], x[test_index]
+     y_train_fold, y_val_fold = y[train_index], y[test_index]
+     xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8)
+     train_and_eval(xg_boost, x_train_fold, y_train_fold, x_val_fold, y_val_fold)
