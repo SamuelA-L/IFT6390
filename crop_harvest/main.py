@@ -7,7 +7,9 @@ from sklearn.metrics import classification_report, confusion_matrix
 from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
-
+from lightgbm import LGBMClassifier
+import keras
+import tensorflow as tf
 
 def create_submission_file(predictions, name='predictions'):
     predictions_df = pd.DataFrame(predictions)
@@ -73,7 +75,21 @@ for i in [2, 4, 6, 8, 10]:
 
 # best hyperparams found : 8 max_dept, 200 estimators
 
-xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8)
-train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
-create_submission_file(xg_boost.predict(x_test).astype(int))
+# xg_boost = xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=8, scale_pos_weight=0.5)
+# train_and_eval(xg_boost, x_train, y_train, x_val, y_val)
+# create_submission_file(xg_boost.predict(x_test).astype(int))
 
+
+# xgboost with pca
+
+# for i in [2, 4, 6, 8, 10, 25]:
+#     for j in [50, 100, 150, 200, 250]:
+#         print('max_depth : ', i, ' n_estim : ', j)
+#         xgb_pca = make_pca_pipeline(xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=j, max_depth=i))
+#         train_and_eval(xgb_pca, x_train, y_train, x_val, y_val)
+#         # create_submission_file(xgb_pca.predict(x_test).astype(int))
+
+
+xgb_pca = make_pca_pipeline(xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=75))
+train_and_eval(xgb_pca, x_train, y_train, x_val, y_val)
+create_submission_file(xgb_pca.predict(x_test).astype(int))
