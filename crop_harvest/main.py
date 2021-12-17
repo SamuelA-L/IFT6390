@@ -12,6 +12,7 @@ from lightgbm import LGBMClassifier
 import keras
 import tensorflow as tf
 
+
 def create_submission_file(predictions, name='predictions'):
     predictions_df = pd.DataFrame(predictions)
     submission_file = open("./" + name + ".csv", "w")
@@ -20,10 +21,12 @@ def create_submission_file(predictions, name='predictions'):
     predictions_df.to_csv(submission_file, index=True)
     submission_file.close()
 
+
 def train_and_eval(model, x_train, y_train, x_val, y_val) :
     model.fit(x_train, y_train)
     predictions = model.predict(x_val)
     print(classification_report(y_true=y_val, y_pred=predictions, target_names=target_names))
+
 
 def make_pca_pipeline(model):
     return make_pipeline(StandardScaler(), PCA(n_components='mle'), model)
