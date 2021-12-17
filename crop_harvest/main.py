@@ -38,9 +38,10 @@ y = train.iloc[:, -1].to_numpy()
 counts = np.unique(y, return_counts=True)
 print('class distribution on training data \n', int(counts[0][0]), ' : ', counts[1][0], '  |  ', int(counts[0][1]), ' : ', counts[1][1])
 x_train, x_val, y_train, y_val = train_test_split(x, y, test_size=0.2, random_state=1)
+print('shape x :', x.shape)
 
 
-def find_best_hyperparams_rf() :
+def find_best_hyperparams_rf():
     for i in [None, 50]:
         for j in [50, 100, 200]:
             for k in [1, 10, 50]:
@@ -67,13 +68,14 @@ def test_rf_generalization():
          rf = RandomForestClassifier(random_state=1, max_depth=None, n_estimators=200, min_samples_leaf=1)
          train_and_eval(rf, x_train_fold, y_train_fold, x_val_fold, y_val_fold)
 
+
 def ada_boost():
     ada_boost = AdaBoostClassifier(random_state=1, n_estimators=250, learning_rate=1.5)
     train_and_eval(ada_boost, x_train, y_train, x_val, y_val)
     create_submission_file(ada_boost.predict(x_test).astype(int))
 
 
-def find_best_hyper_params_xgboost() :
+def find_best_hyper_params_xgboost():
     for i in [2, 4, 6, 8, 10]:
         for j in [50, 100, 150, 200]:
             print('max_dept : ', i , " n_estimators : ", j)
@@ -104,3 +106,6 @@ def test_pca_xgboost():
     xgb_pca = make_pca_pipeline(xgb.XGBClassifier(random_state=1, eval_metric='logloss', use_label_encoder=False, n_estimators=200, max_depth=75))
     train_and_eval(xgb_pca, x_train, y_train, x_val, y_val)
     create_submission_file(xgb_pca.predict(x_test).astype(int))
+
+
+best_rf()
