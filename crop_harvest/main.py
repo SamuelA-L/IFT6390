@@ -8,9 +8,9 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier,
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
 from sklearn.model_selection import KFold
-from lightgbm import LGBMClassifier
-import keras
-import tensorflow as tf
+# from lightgbm import LGBMClassifier
+# import keras
+# import tensorflow as tf
 
 def create_submission_file(predictions, name='predictions'):
     predictions_df = pd.DataFrame(predictions)
@@ -56,6 +56,16 @@ def best_rf():
     train_and_eval(forest, x_train, y_train, x_val, y_val)
     create_submission_file(forest.predict(x_test).astype(int))
 
+
+def test_rf_generalization():
+    kf = KFold(n_splits=5, random_state=1, shuffle=True)
+
+    for train_index, test_index in kf.split(x):
+         print("TRAIN:", len(train_index), "TEST:", len(test_index))
+         x_train_fold, x_val_fold = x[train_index], x[test_index]
+         y_train_fold, y_val_fold = y[train_index], y[test_index]
+         rf = RandomForestClassifier(random_state=1, max_depth=None, n_estimators=200, min_samples_leaf=1)
+         train_and_eval(rf, x_train_fold, y_train_fold, x_val_fold, y_val_fold)
 
 def ada_boost():
     ada_boost = AdaBoostClassifier(random_state=1, n_estimators=250, learning_rate=1.5)
