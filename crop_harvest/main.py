@@ -8,9 +8,9 @@ from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier,
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
 from sklearn.model_selection import KFold
-# from lightgbm import LGBMClassifier
-# import keras
-# import tensorflow as tf
+from lightgbm import LGBMClassifier
+import keras
+import tensorflow as tf
 
 def create_submission_file(predictions, name='predictions'):
     predictions_df = pd.DataFrame(predictions)
