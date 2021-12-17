@@ -1,10 +1,10 @@
 import numpy as np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, scale
+from sklearn.preprocessing import StandardScaler
 from sklearn.decomposition import PCA
-from sklearn.metrics import classification_report, confusion_matrix
-from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier, AdaBoostClassifier
+from sklearn.metrics import classification_report
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.pipeline import make_pipeline
 import xgboost as xgb
 from sklearn.model_selection import KFold
