@@ -112,3 +112,6 @@ def test_pca_xgboost():
 
 
 best_rf()
+# best_xgboost()
+# ada_boost()
+# test_pca_xgboost()
