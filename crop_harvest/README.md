@@ -22,7 +22,7 @@ its dependencies present in the file requirements.txt
     ```
   * install virtualenv
     ```sh
-    sudo python3 -m pip sintall virtualenv
+    sudo python3 -m pip intall virtualenv
     ```
   * create an empty virtual environment
     ```sh
@@ -31,6 +31,10 @@ its dependencies present in the file requirements.txt
   * acvtivate your new virtual environment
     ```sh
     source /myvenv/bin.activate
+    ```
+  * upgrade you virtual environment pip
+    ```sh
+    pip install --upgrade pip
     ```
   * install all the dependencies from requirement.txt
     ```sh
